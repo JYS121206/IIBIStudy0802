@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -7,11 +8,10 @@ public enum MyWeather
 {
     Fair,
     Rain,
-    Snow,
-    MaxCount
+    Snow
 }
 
-public class WeatherManager : MonoBehaviour
+public class WeatherManager : MonoBehaviour, ISubject
 {
     #region Singleton
     private static WeatherManager instance = null;
@@ -42,6 +42,36 @@ public class WeatherManager : MonoBehaviour
     public MyWeather Weather // ³¯¾¾ ÇÁ·ÎÆÛÆ¼
     {
         get { return weather; }
-        set { weather = value; }
-    } 
+        set 
+        { 
+            weather = value;
+            Notify();
+        }
+    }
+
+    List<IObserver> observers = new();
+
+    public void Add(IObserver observer)
+    {
+        if (observers.Contains(observer) == true)
+            return;
+
+        observers.Add(observer);
+        print($"{observer} °¡ÀÔ");
+    }
+    public void Delete(IObserver observer)
+    {
+        if (observers.Contains(observer) == false)
+            return;
+
+        observers.Remove(observer);
+        print($"{observer} Å»Åð");
+    }
+    public void Notify()
+    {
+        foreach(IObserver observer in observers)
+        {
+            observer.UpdateObserver(this);
+        }
+    }
 }
